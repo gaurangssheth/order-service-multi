@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.orderservice.mapper.OrderMapper">
+
+    <insert id="insertOrder" parameterType="com.example.orderservice.model.Order">
+        INSERT INTO orders (
+        id,
+        customer_email,
+        amount,
+        status,
+        created_at
+        )
+        VALUES (
+        #{id,typeHandler=com.example.orderservice.typehandler.UUIDTypeHandler},
+        #{customerEmail},
+        #{amount},
+        #{status},
+        #{createdAt}
+        )
+    </insert>
+
+    <select id="findById"
+            parameterType="java.util.UUID"
+            resultType="com.example.orderservice.model.Order">
+        SELECT
+        id,
+        customer_email,
+        amount,
+        status,
+        created_at
+        FROM orders
+        WHERE id = #{id,typeHandler=com.example.orderservice.typehandler.UUIDTypeHandler}
+    </select>
+
+</mapper>
