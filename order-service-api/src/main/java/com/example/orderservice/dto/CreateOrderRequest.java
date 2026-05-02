@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class CreateOrderRequest {
 
@@ -15,6 +16,8 @@ public class CreateOrderRequest {
     @NotNull
     @DecimalMin("0.01")
     private BigDecimal amount;
+
+    private List<CreateOrderItemRequest> items;
 
     public String getCustomerEmail() {
         return customerEmail;
@@ -30,5 +33,13 @@ public class CreateOrderRequest {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public List<CreateOrderItemRequest> getItems() {
+        return items;
+    }
+
+    public void setItems(List<CreateOrderItemRequest> items) {
+        this.items = items;
     }
 }

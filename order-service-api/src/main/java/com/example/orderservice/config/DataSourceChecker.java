@@ -1,6 +1,7 @@
 package com.example.orderservice.config;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -10,7 +11,7 @@ public class DataSourceChecker {
 
     private final DataSource dataSource;
 
-    public DataSourceChecker(DataSource dataSource) {
+    public DataSourceChecker(@Qualifier("orderDataSource") DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

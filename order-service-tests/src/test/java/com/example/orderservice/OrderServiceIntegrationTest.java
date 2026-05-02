@@ -5,6 +5,7 @@ import com.example.orderservice.dto.OrderResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -15,10 +16,15 @@ import static org.assertj.core.api.Assertions.assertThat;
         classes = OrderServiceApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
+@Sql(
+        scripts = {
+                "/cleanup.sql",
+                "/test-seed.sql"},
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+)
 class OrderServiceIntegrationTest extends BaseIntegrationTest {
 
     @Test
-    @Transactional
     void shouldCreateOrder() {
         CreateOrderRequest request = new CreateOrderRequest();
         request.setCustomerEmail("test@example.com");

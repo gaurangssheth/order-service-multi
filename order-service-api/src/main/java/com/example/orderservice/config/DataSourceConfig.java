@@ -7,15 +7,13 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
 
-@Configuration
 public class DataSourceConfig {
 
-    @Bean
     public DataSource dataSource(
-            @Value("${spring.datasource.url}") String url,
-            @Value("${spring.datasource.username}") String username,
-            @Value("${spring.datasource.password}") String password,
-            @Value("${spring.datasource.driver-class-name}") String driverClassName) {
+            @Value("${app.datasource.order.url}") String url,
+            @Value("${app.datasource.order.username}") String username,
+            @Value("${app.datasource.order.password}") String password,
+            @Value("${app.datasource.order.driver-class-name}") String driverClassName) {
 
         HikariDataSource dataSource = new HikariDataSource();
 

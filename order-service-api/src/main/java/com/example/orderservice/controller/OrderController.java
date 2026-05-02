@@ -7,6 +7,7 @@ import com.example.orderservice.dto.OrderResponse;
 import com.example.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +33,7 @@ public class OrderController extends BaseController {
     }
 
     @PostMapping
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ResponseEntity<OrderResponse> createOrder(
             @RequestHeader(value = "X-User-ID", required = false) String userId,
             @Valid @RequestBody CreateOrderRequest request) {

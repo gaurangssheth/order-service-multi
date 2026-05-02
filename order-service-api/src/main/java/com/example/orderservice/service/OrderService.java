@@ -1,25 +1,34 @@
 package com.example.orderservice.service;
 
+import com.example.orderservice.dto.CreateOrderItemRequest;
 import com.example.orderservice.dto.CreateOrderRequest;
 import com.example.orderservice.dto.OrderResponse;
 import com.example.orderservice.exception.NotFoundException;
+import com.example.orderservice.mapper.OrderItemMapper;
 import com.example.orderservice.mapper.OrderMapper;
-import com.example.orderservice.mapper.dto.OrderDtoMapper;
+import com.example.orderservice.mapping.OrderDtoMapper;
 import com.example.orderservice.model.Order;
+import com.example.orderservice.model.OrderItem;
 import com.example.orderservice.model.OrderStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class OrderService {
 
     private final OrderMapper orderMapper;
+    private final OrderItemMapper orderItemMapper;
     private final OrderDtoMapper orderDtoMapper;
 
-    public OrderService(OrderMapper orderMapper, OrderDtoMapper orderDtoMapper) {
+    public OrderService(OrderMapper orderMapper,
+                        OrderItemMapper orderItemMapper,
+                        OrderDtoMapper orderDtoMapper) {
         this.orderMapper = orderMapper;
+        this.orderItemMapper = orderItemMapper;
         this.orderDtoMapper = orderDtoMapper;
     }
 
@@ -34,11 +43,29 @@ public class OrderService {
 
         orderMapper.insertOrder(order);
 
+        List<OrderItem> items = new ArrayList<>();
+        if (request.getItems() != null) {
+            for (CreateOrderItemRequest itemReq : request.getItems()) {
+
+                OrderItem item = new OrderItem();
+                item.setId(UUID.randomUUID());
+                item.setOrderId(order.getId());
+                item.setProductCode(itemReq.getProductCode());
+                item.setQuantity(itemReq.getQuantity());
+                item.setUnitPrice(itemReq.getUnitPrice());
+
+                orderItemMapper.insertOrderItem(item);
+
+                items.add(item);
+            }
+            order.setItems(items);
+        }
+
         return orderDtoMapper.toResponse(order);
     }
 
     public OrderResponse getOrder(UUID id) {
-        Order order = orderMapper.findById(id);
+        Order order = orderMapper.findByIdWithItems(id);
 
         if (order == null) {
             throw new NotFoundException("Order not found with id: " + id);
@@ -53,7 +80,8 @@ public class OrderService {
                 order.getCustomerEmail(),
                 order.getAmount(),
                 order.getStatus(),
-                order.getCreatedAt()
+                order.getCreatedAt(),
+                null // Items will be set separately
         );
     }
 }

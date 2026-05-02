@@ -5,7 +5,28 @@
 
 <mapper namespace="com.example.orderservice.mapper.OrderMapper">
 
-    <insert id="insertOrder" parameterType="com.example.orderservice.model.Order">
+    <resultMap id="OrderWithItemsResultMap" type="com.example.orderservice.model.Order">
+        <id property="id"
+            column="order_id"
+            typeHandler="com.example.orderservice.typehandler.UUIDTypeHandler"/>
+
+        <result property="customerEmail" column="customer_email"/>
+        <result property="amount" column="amount"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+
+        <collection property="items" resultMap="com.example.orderservice.mapper.OrderItemMapper.OrderItemJoinResultMap"/>
+    </resultMap>
+
+    <resultMap id="OrderResultMap" type="com.example.orderservice.model.Order">
+        <id property="id" column="id" typeHandler="com.example.orderservice.typehandler.UUIDTypeHandler"/>
+        <result property="customerEmail" column="customer_email"/>
+        <result property="amount" column="amount"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insertOrder">
         INSERT INTO orders (
         id,
         customer_email,
@@ -14,11 +35,28 @@
         created_at
         )
         VALUES (
-        #{id,typeHandler=com.example.orderservice.typehandler.UUIDTypeHandler},
-        #{customerEmail},
-        #{amount},
-        #{status},
-        #{createdAt}
+        #{order.id,typeHandler=com.example.orderservice.typehandler.UUIDTypeHandler},
+        #{order.customerEmail},
+        #{order.amount},
+        #{order.status,jdbcType=VARCHAR},
+        #{order.createdAt}
+        )
+    </insert>
+
+    <insert id="insertOrderItem">
+        INSERT INTO order_items (
+        id,
+        order_id,
+        product_code,
+        quantity,
+        unit_price
+        )
+        VALUES (
+        #{item.id,typeHandler=com.example.orderservice.typehandler.UUIDTypeHandler},
+        #{item.orderId,typeHandler=com.example.orderservice.typehandler.UUIDTypeHandler},
+        #{item.productCode},
+        #{item.quantity},
+        #{item.unitPrice}
         )
     </insert>
 
@@ -33,6 +71,24 @@
         created_at
         FROM orders
         WHERE id = #{id,typeHandler=com.example.orderservice.typehandler.UUIDTypeHandler}
+    </select>
+
+    <select id="findByIdWithItems" resultMap="OrderWithItemsResultMap">
+        SELECT
+        o.id AS order_id,
+        o.customer_email,
+        o.amount,
+        o.status,
+        o.created_at,
+
+        i.id AS item_id,
+        i.order_id,
+        i.product_code,
+        i.quantity,
+        i.unit_price
+        FROM orders o
+        LEFT JOIN order_items i ON i.order_id = o.id
+        WHERE o.id = #{id,typeHandler=com.example.orderservice.typehandler.UUIDTypeHandler}
     </select>
 
 </mapper>

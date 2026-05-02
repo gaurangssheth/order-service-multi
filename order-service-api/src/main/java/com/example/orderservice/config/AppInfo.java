@@ -14,7 +14,7 @@ public class AppInfo {
     @Value("${app.environment}")
     private String environment;
 
-    @Value("${spring.datasource.username}")
+    @Value("${app.datasource.order.username}")
     private String dbUserName;
 
     public String getAppName() {
